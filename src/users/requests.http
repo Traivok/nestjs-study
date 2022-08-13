@@ -1,0 +1,68 @@
+### Create a new user
+POST http://localhost:{{port}}/auth/signup
+content-type: application/json
+
+{
+  "email": "abc@def.com",
+  "password": "password"
+}
+
+###
+POST http://localhost:{{port}}/auth/signup
+content-type: application/json
+
+{
+  "email": "newuser@def.com",
+  "password": "password"
+}
+
+###
+POST http://localhost:{{port}}/auth/signup
+content-type: application/json
+
+{
+  "email": "user@mail.com",
+  "password": "password"
+}
+
+### Trying to Create a new user with an invalid password DTO
+POST http://localhost:{{port}}/auth/signup
+content-type: application/json
+
+{
+  "email": "abc@ef.com",
+  "password": false
+}
+
+### Trying to Create a new user with an invalid mail DTO
+POST http://localhost:{{port}}/auth/signup
+content-type: application/json
+
+{
+  "email": "abcef.com",
+  "password": "124"
+}
+
+
+### Get all users
+GET http://localhost:{{port}}/auth
+
+### Get user by mail
+GET http://localhost:{{port}}/auth?email=abc@def.com
+
+### Get an User
+GET http://localhost:{{port}}/auth/1
+
+### Get a not found User
+GET http://localhost:{{port}}/auth/1222222
+
+### Delete an user
+DELETE http://localhost:{{port}}/auth/2
+
+### UPDATE an user
+PATCH http://localhost:{{port}}/auth/4
+content-type: application/json
+
+{
+  "password": "updated"
+}
