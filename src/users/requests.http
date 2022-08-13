@@ -1,3 +1,12 @@
+### Login
+POST http://localhost:{{port}}/auth/signin
+content-type: application/json
+
+{
+  "email": "john@mail.com",
+  "password": "password"
+}
+
 ### Create a new user
 POST http://localhost:{{port}}/auth/signup
 content-type: application/json

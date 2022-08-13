@@ -1,8 +1,14 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import { InjectRepository }                        from '@nestjs/typeorm';
-import { User }               from '../user.entity';
-import { Repository }         from 'typeorm';
-import { UsersService }       from '../users.service';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { InjectRepository }                          from '@nestjs/typeorm';
+import { User }                                      from '../user.entity';
+import { Repository }                                from 'typeorm';
+import { UsersService }                              from '../users.service';
+import { promisify }                                 from 'util';
+import { randomBytes, scrypt as _scrypt }            from 'crypto';
+import { CreateUserDto }                             from '../dtos/create-user.dto';
+import { AuthUserDto }                               from '../dtos/auth-user.dto';
+
+const scrypt = promisify(_scrypt);
 
 @Injectable()
 export class AuthService {
@@ -11,22 +17,32 @@ export class AuthService {
     constructor(private userSrv: UsersService,
                 @InjectRepository(User) private repo: Repository<User>) {}
 
-    async signIn(email: string, password: string): Promise<boolean> {
+    async signIn({ email, password }: AuthUserDto): Promise<User> {
+        const user = await this.userSrv.findOneByEmailOrNotFound(email);
 
-        return false;
+        const [ salt, storedHash ] = user.password.split('.');
+        const hash                 = ( await scrypt(password, salt, 32) ) as Buffer;
+
+        if (storedHash !== hash.toString('hex')) {
+            throw new UnauthorizedException('Invalid email or password.');
+        }
+
+        return user;
     }
 
-    async signUp(email: string, password: string): Promise<User> {
-        // todo move this to the dabatase
-        // see if email is in use
-        const users = await this.userSrv.find(email);
+    async signUp({ password, ...userDto }: CreateUserDto): Promise<User> {
 
-        if (users.length > 0)
-            throw new BadRequestException('email in use');
+        // generate a salt
+        const salt = randomBytes(8).toString('hex');
 
-        // hash the user's password
+        // hash the salt and the password together
+        const hash = ( await scrypt(password, salt, 32) ) as Buffer;
 
-        return null;
+        // join the hashed result and the salt together
+        const result = salt + '.' + hash.toString('hex');
+
+        // create a new user and save it
+        // return new user
+        return await this.userSrv.create({ ...userDto, password: result });
     }
-
 }

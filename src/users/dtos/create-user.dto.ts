@@ -3,10 +3,10 @@ import { ApiProperty }       from '@nestjs/swagger';
 
 export class CreateUserDto {
   @IsEmail()
-  @ApiProperty({ example: 'abc@def.com', description: 'User email'})
+  @ApiProperty({ example: 'john@mail.com', description: 'User email'})
   email: string;
 
   @IsString()
-  @ApiProperty({ example: '123pass', description: 'User password'})
+  @ApiProperty({ example: 'password', description: 'User password'})
   password: string;
 }

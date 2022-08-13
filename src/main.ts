@@ -1,14 +1,20 @@
-import { HttpAdapterHost, NestFactory } from '@nestjs/core';
-import { AppModule }                    from './app.module';
-import { ValidationPipe }                 from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { NestFactory }                     from '@nestjs/core';
+import { AppModule }                       from './app.module';
+import { UseInterceptors, ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule }  from '@nestjs/swagger';
+import { CurrentUserInterceptor }          from './users/interceptors/current-user.interceptor';
+
+const cookieSession = require('cookie-session');
 
 ( async function bootstrap() {
     const app = await NestFactory.create(AppModule);
 
+    app.use(cookieSession({ keys: [ 'authCookie' ] }));
+
     app.useGlobalPipes(new ValidationPipe({
         whitelist: true,
     }));
+
 
     app.useLogger([ 'log', 'warn', 'error', 'verbose', 'debug' ]);
 
@@ -18,6 +24,11 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
         .setVersion('1.0')
         .addTag('user')
         .addTag('report')
+        .addCookieAuth('authCookie', {
+            type: 'http',
+            in: 'Header',
+            scheme: 'Bearer'
+        })
         .build();
 
     SwaggerModule.setup('api', app, SwaggerModule.createDocument(app, swaggerConf));
