@@ -1,7 +1,5 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
-import { InjectRepository }                          from '@nestjs/typeorm';
 import { User }                                      from '../user.entity';
-import { Repository }                                from 'typeorm';
 import { UsersService }                              from '../users.service';
 import { promisify }                                 from 'util';
 import { randomBytes, scrypt as _scrypt }            from 'crypto';
@@ -14,16 +12,20 @@ const scrypt = promisify(_scrypt);
 export class AuthService {
     private readonly logger = new Logger(AuthService.name);
 
-    constructor(private userSrv: UsersService,
-                @InjectRepository(User) private repo: Repository<User>) {}
+    constructor(private userSrv: UsersService) {}
 
-    async signIn({ email, password }: AuthUserDto): Promise<User> {
-        const user = await this.userSrv.findOneByEmailOrNotFound(email);
-
+    private static async passwordMatches(user, password) {
         const [ salt, storedHash ] = user.password.split('.');
         const hash                 = ( await scrypt(password, salt, 32) ) as Buffer;
 
-        if (storedHash !== hash.toString('hex')) {
+        return storedHash === hash.toString('hex');
+    }
+
+    async signIn({ email, password }: AuthUserDto): Promise<User> {
+        const [ user = null ] = await this.userSrv.find(email);
+
+        // test if user is not found OR if password does not match
+        if (user === null || !(await AuthService.passwordMatches(user, password))) {
             throw new UnauthorizedException('Invalid email or password.');
         }
 
@@ -31,7 +33,6 @@ export class AuthService {
     }
 
     async signUp({ password, ...userDto }: CreateUserDto): Promise<User> {
-
         // generate a salt
         const salt = randomBytes(8).toString('hex');
 
