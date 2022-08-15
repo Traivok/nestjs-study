@@ -38,7 +38,7 @@ export class UsersController {
 
     @Post('/signup')
     @ApiOperation({ summary: 'Create user' })
-    async createUser(@Body() body: CreateUserDto, @Session() session: any): Promise<UserDto> {
+    async signUp(@Body() body: CreateUserDto, @Session() session: any): Promise<UserDto> {
         const user     = await this.authSrv.signUp(body);
         session.userId = user.id;
         return user;

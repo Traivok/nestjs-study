@@ -22,6 +22,7 @@ export class UniqueViolationInterceptor implements NestInterceptor {
         return next.handle()
             .pipe(catchError(error => {
                 if (error instanceof QueryFailedError) {
+                    this.logger.debug(error);
                     const msg = error.message;
 
                     if (typeof msg === 'string' && msg.match(/^(.*\s)?unique(\s.*)?$/i)) {
