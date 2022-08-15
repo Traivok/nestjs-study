@@ -55,6 +55,7 @@ export class UsersController {
     @Get('/whoami')
     @UseGuards(AuthGuard)
     whoAmi(@CurrentUser() user: User): UserDto {
+        this.logger.debug(user);
         if (user === null)
             throw new NotFoundException();
 
