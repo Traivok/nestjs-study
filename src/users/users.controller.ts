@@ -16,7 +16,6 @@ import { UsersService }                       from './users.service';
 import { UpdateUserDto }                      from './dtos/update-user.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiImplicitQuery }                   from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator';
-import { Serialize }                          from 'src/interceptors/serialize.interceptor';
 import { UserDto }                            from './dtos/user.dto';
 import { CatchUniqueViolation }               from '../interceptors/unique-violation.interceptor';
 import { AuthService }                        from './auth/auth.service';
@@ -24,8 +23,8 @@ import { AuthUserDto }                        from './dtos/auth-user.dto';
 import { CurrentUser }                        from './decorators/current-user.decorator';
 import { User }                               from './user.entity';
 import { AuthGuard }                          from './auth/auth.guard';
+import { Serialize }                          from '../interceptors/serialize.interceptor';
 
-// @ts-ignore
 @ApiTags('user')
 @Serialize(UserDto)
 @CatchUniqueViolation()
