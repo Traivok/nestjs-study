@@ -9,7 +9,6 @@ export class CurrentUserInterceptor implements NestInterceptor {
     async intercept(context: ExecutionContext, next: CallHandler) {
         const request    = context.switchToHttp().getRequest();
         const { userId } = request.session ?? {};
-        this.logger.debug(userId);
 
         if (userId !== null && userId !== undefined)
             request.currentUser = await this.userSrv.findOne(userId);

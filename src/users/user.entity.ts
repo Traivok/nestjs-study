@@ -1,7 +1,15 @@
-import { Entity, Column, PrimaryGeneratedColumn, AfterInsert, AfterUpdate, AfterRemove, Unique } from 'typeorm';
-import { Logger }                                                                                from '@nestjs/common';
-import { ApiProperty }                                                                   from '@nestjs/swagger';
-import { Exclude } from 'class-transformer';
+import {
+    Entity,
+    Column,
+    PrimaryGeneratedColumn,
+    AfterInsert,
+    AfterUpdate,
+    AfterRemove,
+    OneToMany,
+}                      from 'typeorm';
+import { Logger }      from '@nestjs/common';
+import { Exclude }     from 'class-transformer';
+import { Report }      from '../reports/reports.entity';
 
 @Entity('users')
 export class User {
@@ -16,6 +24,9 @@ export class User {
 
     @Column()
     password: string;
+
+    @OneToMany(() => Report, (report: Report): User => report.user)
+    reports: Report[]
 
     private log(action: string): void {
         this.logger.debug(`${ action }ed User with id ${ this.id }`);
