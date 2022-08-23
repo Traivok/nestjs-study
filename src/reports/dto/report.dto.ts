@@ -3,6 +3,7 @@ import { Expose, Transform } from 'class-transformer';
 
 export class ReportDto {
     @Expose() @ApiProperty() id: number;
+    @Expose() @ApiProperty() approved: boolean;
     @Expose() @ApiProperty() price: number;
     @Expose() @ApiProperty() year: number;
     @Expose() @ApiProperty() lng: number;
@@ -14,5 +15,5 @@ export class ReportDto {
     @Transform(({ obj }): number => obj.user.id)
     @Expose()
     @ApiProperty()
-    userid: number;
+    userId: number;
 }
